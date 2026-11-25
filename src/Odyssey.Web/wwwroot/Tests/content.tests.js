@@ -86,6 +86,21 @@ describe('validateGame', () => {
 		]);
 	});
 
+	it('validateGame reports missing and malformed translations of names and dialog options', () => {
+		const dialog = { nodes: { root: { options: [{ id: 'hi', text: 'Hi' }] } } },
+			languages = { en: {}, cs: { strings: { 'Key': { acc: 'klíč' } } } },
+			problems = validateGame(game({ items: { key: { name: 'Key' } }, dialogs: { guard: dialog }, languages }));
+
+		expect(problems).toEqual([
+			'language \'cs\': missing translation of \'Hi\'',
+			'language \'cs\': translation of \'Key\' must be a text or { text, ...forms }'
+		]);
+	});
+
+	it('validateGame reports a source language that is not in languages', () => {
+		expect(validateGame(game({ language: 'de', languages: { en: {} } }))).toEqual(['game: the source language \'de\' is not in languages']);
+	});
+
 	it('validateGame reports a missing start node', () => {
 		const dialog = { start: 'hello', nodes: { root: { options: [] } } };
 		expect(validateGame(game({ dialogs: { guard: dialog } }))).toEqual(['dialog \'guard\': missing start node \'hello\'']);

@@ -16,6 +16,8 @@ export default {
 	id: 'odyssey',              //also the name of the IndexedDB database with save games
 	name: 'Odyssey',            //drawn on the title screen
 	player: 'hero',             //actor id of the player
+	language: 'en',             //the language the content is written in
+	languages: { en: { name: 'English' }, cs: { name: 'Čeština', strings: cs } },   //see Translations
 	start: { room: 'beach', entry: 'start' },
 	narratorColor: '#ffe070',   //color of g.narrate() text
 	titleScreen: painter,       //title backdrop, a painter function or an image path
@@ -171,6 +173,33 @@ export default {
 
 Register dialogs under `dialogs` in `index.js` and start one from a script with `await g.dialog('hermit')`.
 Option ids must be unique within a dialog, because the progress of `once` options is saved by id.
+
+## Translations (`translations/*.js`)
+
+Content is written in one language (`language`, English by default) and every other language has a catalog that maps
+the source text to its translation. The engine translates when it shows a text: speech and narration, dialog options,
+hover labels, item names, room names in save slots and the game name. Scripts keep passing the source text, so `g.say('Nope.')`
+shows the Czech line when Czech is chosen. A text without a translation is shown in the source language.
+
+```js
+export default {
+	'Campfire': 'Táborák',
+	'A small, cheerful campfire.': 'Malý, veselý táborák.',
+	'Sign': { text: 'Cedule', acc: 'Ceduli' }      //other grammatical forms of a name
+};
+```
+
+The player picks the language in Settings opened from the main menu; the Settings of the pause menu do not offer it. The first time the game starts,
+it uses the browser's language when the game has it. The engine's own texts (menus, default replies) are translated in
+`engine/translations`. A new language of the engine gets a catalog there, registered in `engine/i18n.js`.
+
+Templates such as `'Use {item} with {target}'` fill in names; a placeholder may ask for a form, so the Czech catalog translates it
+as `'Použij {item.acc} na {target.acc}'` and a name with an `acc` form uses it there. Give names that form when their accusative
+differs from the name (most feminine and animate masculine nouns, adjectives).
+
+The content check reports names, pick up texts, dialog options and messages that have no translation. Lines said inside scripts
+cannot be checked that way; a missing one is reported in the browser console as `missing cs translation: '...'` when it is shown.
+Change the source text and its catalog key together, otherwise the translation is lost.
 
 ## Script api (`g`)
 

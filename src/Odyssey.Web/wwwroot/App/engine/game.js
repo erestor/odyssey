@@ -5,6 +5,7 @@ import { clamp } from './canvas.js';
 import { defaultSettings, logicalHeight, logicalWidth, renderProfiles, textTiming, timing } from './config.js';
 import { createCostume } from './costumes.js';
 import { Display } from './display.js';
+import { Translator } from './i18n.js';
 import { Input } from './input.js';
 import { Room } from './room.js';
 import { availableOptions, findCombination, resolveInteraction } from './rules.js';
@@ -23,7 +24,8 @@ const defaultMessages = {
 	interact: ['I can\'t do anything with that.', 'That won\'t work.', 'Nope.'],
 	useItem: ['That doesn\'t work.', 'I don\'t think so.', 'Why would I do that?'],
 	combine: ['Those don\'t go together.', 'That doesn\'t work.'],
-	useLabel: (item, target) => target ? `Use ${item} with ${target}` : `Use ${item} with...`,
+	useLabel: 'Use {item} with...',
+	useWithLabel: 'Use {item} with {target}',
 	emptyInventory: 'Your pockets are empty.',
 	saved: 'Game saved.'
 };
@@ -36,6 +38,10 @@ export class Game {
 		this.messages = { ...defaultMessages, ...definition.messages };
 		this.storage = new Storage(definition.id);
 		this.settings = this.storage.loadSettings(defaultSettings);
+		this.translator = new Translator(definition.language, definition.languages);
+		if (!this.translator.languages[this.settings.language])
+			this.settings.language = this.translator.preferred(navigator.languages ?? []);
+
 		this.display = new Display(container);
 		this.input = new Input(this.display);
 		this.assets = new Assets(definition.assetsUrl ?? 'Assets/');
@@ -88,7 +94,13 @@ export class Game {
 			this.text = new TextRenderer(profile.renderScale);
 			await this._loadResources();
 		}
+		this.translator.use(settings.language);
 		this.storage.saveSettings(settings);
+	}
+
+	//translates a text of the game's source language into the current language, see i18n.js
+	t(text, values = null) {
+		return this.translator.translate(text, values);
 	}
 
 	//game flow
@@ -159,6 +171,7 @@ export class Game {
 		if (Array.isArray(text))
 			return this._sayLines(actorId, text);
 
+		text = this.t(String(text));
 		const actor = actorId ? this.actors.get(actorId) : null;
 		this.texts.filter(line => line.actor === actor).forEach(line => this._finishText(line));
 		return new Promise(resolve => {
@@ -213,7 +226,7 @@ export class Game {
 	}
 
 	choose(texts) {
-		return new Promise(resolve => this.openOverlay(new DialogChoices(this, texts, resolve)));
+		return new Promise(resolve => this.openOverlay(new DialogChoices(this, texts.map(text => this.t(text)), resolve)));
 	}
 
 	//dialog is an id from the game definition's dialogs, or { id, start, nodes: { name: { options: [{ id, text, once, when, say, run, goto, end }] } } }
@@ -276,6 +289,12 @@ export class Game {
 
 	itemName(id) {
 		return this.items[id]?.name ?? id;
+	}
+
+	//"Use item with target" in the current language; both names are source texts
+	useLabel(itemId, targetName = null) {
+		const item = this.itemName(itemId);
+		return targetName ? this.t(this.messages.useWithLabel, { item, target: targetName }) : this.t(this.messages.useLabel, { item });
 	}
 
 	lookAtItem(id) {
@@ -648,7 +667,7 @@ export class Game {
 		if (picture)
 			context.drawImage(picture.source, 0, 0, picture.width, picture.height);
 
-		this.text.draw(context, this.definition.name ?? '', logicalWidth / 2, 28, { color: colors.title, scale: 3 });
+		this.text.draw(context, this.t(this.definition.name ?? ''),logicalWidth / 2, 28, { color: colors.title, scale: 3 });
 	}
 
 	_renderWorld(context) {
@@ -703,7 +722,7 @@ export class Game {
 		if (this.busy)
 			return;
 
-		const label = this.heldItem ? this.messages.useLabel(this.itemName(this.heldItem), this.hover?.name) : this.hover?.name;
+		const label = this.heldItem ? this.useLabel(this.heldItem, this.hover?.name) : this.hover && this.t(this.hover.name);
 		if (label)
 			this.text.draw(context, label, logicalWidth / 2, logicalHeight - 13, { color: colors.label });
 	}

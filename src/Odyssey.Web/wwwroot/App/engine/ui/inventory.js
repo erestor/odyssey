@@ -125,8 +125,8 @@ export class InventoryPanel {
 
 		const held = game.heldItem,
 			hovered = this.hovered,
-			label = held ? game.messages.useLabel(game.itemName(held), hovered && hovered !== held ? game.itemName(hovered) : null) :
-				hovered ? game.itemName(hovered) : game.state.inventory.length ? '' : game.messages.emptyInventory;
+			label = held ? game.useLabel(held, hovered && hovered !== held ? game.itemName(hovered) : null) :
+				hovered ? game.t(game.itemName(hovered)) : game.state.inventory.length ? '' : game.t(game.messages.emptyInventory);
 
 		if (label)
 			game.text.draw(context, label, this.x + this.width / 2, this.y + this.height - lineHeight - 3, { color: colors.label });

@@ -1,6 +1,10 @@
 import { createCanvas } from './canvas.js';
 import { logicalHeight, logicalWidth } from './config.js';
 
+//VGA pixels were 20% taller than wide: 320x200 filled a 4:3 monitor. The default is square pixels (16:10),
+//aspect correction shows the game in the 4:3 shape of the original monitors
+const vgaPixelAspect = 1.2;
+
 //owns the visible canvas and the low resolution back buffer that the game draws into
 export class Display {
 	constructor(container) {
@@ -32,10 +36,12 @@ export class Display {
 		const ratio = window.devicePixelRatio || 1,
 			availableWidth = this.container.clientWidth * ratio,
 			availableHeight = this.container.clientHeight * ratio,
-			aspect = this.aspectCorrection ? 1.2 : 1; //VGA pixels were 20% taller than wide on a 4:3 monitor
+			aspect = this.aspectCorrection ? vgaPixelAspect : 1;
 
 		let scale = Math.min(availableWidth / this.width, availableHeight / (this.height * aspect));
-		if (this.scaleMode === 'integer' && scale >= 1)
+		if (this.scaleMode === 'none')
+			scale = Math.min(scale, 1); //one game pixel per screen pixel, smaller only when the window is too small
+		else if (this.scaleMode === 'integer' && scale >= 1)
 			scale = Math.floor(scale);
 
 		const width = Math.max(1, Math.round(this.width * scale)),

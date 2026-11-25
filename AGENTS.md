@@ -51,6 +51,9 @@ Frontend-specific instructions are in `src/Odyssey.Web/AGENTS.md`. The format of
   A room with `map: true` is a map: the player is not placed in it and clicks on its objects act without walking.
 - `rules.js` holds the interface rules that need no screen (which handler a click runs, item combinations, available dialog options),
   so they can be tested. `validate.js` checks the references in the game content; `game.js` logs its problems at startup.
+- `i18n.js` translates texts of the content's source language through catalogs keyed by the source text (game catalogs in
+  `game/translations`, the engine's in `engine/translations`). Content and engine pass source texts; they are translated where they are shown
+  (`game.say`, `game.choose`, labels, menus), never stored translated. The language is a setting offered only in the Settings opened from the title menu.
 - `pathfinding.js` finds paths over a walk area (outer polygon with holes) using a visibility graph and A*.
 - `text.js` and `font.js` render text with a built-in 5x8 bitmap font; accented letters are composed from base glyphs and marks, so Czech and other
   Latin scripts work without extra glyphs.
@@ -64,6 +67,6 @@ Frontend-specific instructions are in `src/Odyssey.Web/AGENTS.md`. The format of
 
 ## Tests
 - Use Jasmine (`wwwroot/Tests`). Each test file is an ES module imported by `test-runner.html`; add new files there.
-- Test pure engine modules (geometry, pathfinding, text, state, rules, actor, room, storage). `content.tests.js` runs `validateGame` on the real
+- Test pure engine modules (geometry, pathfinding, text, state, rules, actor, room, storage, i18n). `content.tests.js` runs `validateGame` on the real
   game definition, so broken references in the story fail the test run. Name specs as `method condition result` sentences, for example `findPath walks around a hole`.
 - If a test is 5 lines or shorter, do not insert any blank lines.

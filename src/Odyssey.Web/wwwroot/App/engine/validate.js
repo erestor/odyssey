@@ -1,5 +1,6 @@
 import { logicalHeight, logicalWidth } from './config.js';
 import { toPoints } from './geometry.js';
+import { engineTranslations } from './i18n.js';
 import { WalkArea } from './pathfinding.js';
 
 //checks the references in a game definition that the engine cannot check while playing:
@@ -88,7 +89,54 @@ export function validateGame(definition) {
 	for (const [dialogId, dialog] of Object.entries(definition.dialogs ?? {}))
 		validateDialog(dialog, `dialog '${dialogId}'`, report);
 
+	validateTranslations(definition, report);
 	return problems;
+}
+
+//texts said inside scripts cannot be found here; a missing translation of those is reported in the console while playing
+function validateTranslations(definition, report) {
+	const source = definition.language ?? 'en',
+		languages = definition.languages;
+
+	if (!languages)
+		return;
+
+	if (!languages[source])
+		report('game', `the source language '${source}' is not in languages`);
+
+	const texts = staticTexts(definition);
+	Object.entries(languages).filter(([id]) => id !== source).forEach(([id, language]) => {
+		const where = `language '${id}'`,
+			strings = { ...engineTranslations[id], ...language.strings };
+
+		texts.filter(text => strings[text] === undefined).forEach(text => report(where, `missing translation of '${text}'`));
+		Object.entries(language.strings ?? {})
+			.filter(([, entry]) => typeof entry !== 'string' && typeof entry?.text !== 'string')
+			.forEach(([text]) => report(where, `translation of '${text}' must be a text or { text, ...forms }`));
+	});
+}
+
+//names, pick up texts, dialog options and messages of the game definition
+function staticTexts(definition) {
+	const texts = new Set(),
+		add = text => [text ?? []].flat().forEach(item => texts.add(item));
+
+	add(definition.name);
+	Object.values(definition.messages ?? {}).forEach(add);
+	for (const room of Object.values(definition.rooms ?? {})) {
+		add(room.name);
+		(room.objects ?? []).forEach(object => {
+			add(object.name);
+			add(object.pickUpText);
+		});
+	}
+	Object.values(definition.actors ?? {}).forEach(actor => add(actor.name));
+	Object.values(definition.items ?? {}).forEach(item => add(item.name));
+	Object.values(definition.dialogs ?? {})
+		.flatMap(dialog => Object.values(dialog.nodes ?? {}))
+		.forEach(node => (node.options ?? []).forEach(option => add(option.text)));
+
+	return [...texts];
 }
 
 function validateDialog(dialog, where, report) {
