@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/copilot-instructions.md" />
+    <File Path="AGENTS.md" />
+    <File Path="docs/AUTHORING.md" />
+  </Folder>
+  <Project Path="src/Odyssey.Web/Odyssey.Web.csproj" />
+</Solution>

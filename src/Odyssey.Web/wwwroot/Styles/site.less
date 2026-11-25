@@ -1,0 +1,30 @@
+@background: #000;
+@text: #c0c0c0;
+
+html, body {
+	margin: 0;
+	height: 100%;
+	overflow: hidden;
+	background: @background;
+}
+
+#game {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	canvas.screen {
+		display: block;
+		image-rendering: pixelated;
+		cursor: none;
+		touch-action: none;
+		user-select: none;
+	}
+}
+
+noscript {
+	color: @text;
+	font-family: monospace;
+}

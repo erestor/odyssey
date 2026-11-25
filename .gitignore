@@ -1,0 +1,39 @@
+# Compiled source #
+###################
+bin/
+obj/
+**/wwwroot/App/build/
+Debug/
+Release/
+
+# Generated styles #
+####################
+**/wwwroot/Styles/site.css
+**/wwwroot/Styles/site.min.css
+
+# Visual studio files #
+#######################
+*.pdb
+*.suo
+*.user
+.vs/
+
+# Packages #
+############
+node_modules/
+*.7z
+*.gz
+*.rar
+*.zip
+
+# Logs #
+########
+*.log
+
+# OS generated files #
+######################
+.DS_Store*
+Thumbs.db
+
+# Claude
+.claude/

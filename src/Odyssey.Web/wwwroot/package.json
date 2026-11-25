@@ -1,0 +1,16 @@
+{
+	"name": "odyssey",
+	"version": "0.1.0",
+	"author": "Martin Klemsa",
+	"private": true,
+	"devDependencies": {
+		"esbuild": "^0.25.0",
+		"grunt": "^1.6.1",
+		"grunt-contrib-jshint": "^3.2.0",
+		"grunt-contrib-less": "^3.0.0",
+		"grunt-contrib-watch": "^1.1.0",
+		"grunt-htmlhint": "*",
+		"jasmine-core": "^5.4.0",
+		"matchdep": "^2.0.0"
+	}
+}

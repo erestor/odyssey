@@ -1,0 +1,46 @@
+@page
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Hosting
+@inject IWebHostEnvironment Environment
+
+<!DOCTYPE html>
+<html lang="en">
+@{
+	var version = "0.1.0";
+}
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="0" />
+
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+		<meta name="description" content="Odyssey, a point and click adventure" />
+		<meta name="google" content="notranslate" />
+		<meta name="theme-color" content="#000000" />
+
+		<title>Odyssey</title>
+
+		@if (Environment.IsDevelopment()) {
+			<link href="~/Styles/site.css?v=@version" rel="stylesheet" />
+		}
+		else {
+			<link href="~/Styles/site.min.css?v=@version" rel="stylesheet" />
+		}
+	</head>
+	<body>
+		<div id="game"></div>
+
+		@if (Environment.IsDevelopment()) {
+			<script type="module" src="~/App/main.js?v=@version"></script>
+		}
+		else {
+			<script type="module" src="~/App/build/main-built.js?v=@version"></script>
+		}
+
+		<noscript>Odyssey requires Javascript to work.</noscript>
+	</body>
+</html>
