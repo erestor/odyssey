@@ -1,5 +1,5 @@
 import { logicalHeight, logicalWidth } from './config.js';
-import { pointInPolygon, toPoints } from './geometry.js';
+import { pointInPolygon, rectContains, toPoints } from './geometry.js';
 import { WalkArea } from './pathfinding.js';
 
 //a loaded room: its definition plus the pictures and walk area built from it.
@@ -13,7 +13,7 @@ export class Room {
 		this.height = definition.height ?? logicalHeight;
 		this.walkArea = WalkArea.fromDefinition(definition.walkArea, this.width, this.height);
 		this.background = null;
-		this.objects = (definition.objects ?? []).map(object => new RoomObject(object));
+		this.objects = (definition.objects ?? []).map(object => new RoomObject(object, id));
 	}
 
 	static async load(id, definition, assets) {
@@ -52,9 +52,10 @@ export class Room {
 }
 
 export class RoomObject {
-	constructor(definition) {
+	constructor(definition, roomId) {
 		this.definition = definition;
 		this.id = definition.id;
+		this.key = `${roomId}.${definition.id}`; //identifies the object in the game state
 		this.name = definition.name ?? null;
 		this.x = definition.x ?? 0;
 		this.y = definition.y ?? 0;
@@ -73,7 +74,11 @@ export class RoomObject {
 		return !!(this.picture || this.definition.draw);
 	}
 
+	//an object with an item disappears once it is picked up
 	isVisible(api) {
+		if (this.definition.item && api.state.taken[this.key])
+			return false;
+
 		return !this.definition.visible || this.definition.visible(api);
 	}
 
@@ -81,7 +86,7 @@ export class RoomObject {
 		if (this.polygon)
 			return pointInPolygon({ x, y }, this.polygon);
 
-		return x >= this.x && x < this.x + this.width && y >= this.y && y < this.y + this.height;
+		return rectContains(this, x, y);
 	}
 
 	draw(context, time, api) {

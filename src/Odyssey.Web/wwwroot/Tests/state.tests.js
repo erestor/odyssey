@@ -19,11 +19,19 @@ describe('GameState', () => {
 	});
 
 	it('toJSON round trips through the constructor', () => {
-		const state = new GameState({ room: 'cave', flags: { a: 1 }, inventory: ['torch'], visited: { cave: true }, playTime: 1234.4 }),
+		const state = new GameState({
+				room: 'cave',
+				flags: { a: 1 },
+				inventory: ['torch'],
+				visited: { cave: true },
+				taken: { 'beach.driftwood': true },
+				playTime: 1234.4
+			}),
 			json = state.toJSON();
 
 		expect(json.version).toBe(stateVersion);
 		expect(json.playTime).toBe(1234);
+		expect(json.taken).toEqual({ 'beach.driftwood': true });
 		expect(new GameState(json).toJSON()).toEqual(json);
 	});
 });

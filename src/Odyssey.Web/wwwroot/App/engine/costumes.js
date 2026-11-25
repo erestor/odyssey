@@ -1,4 +1,5 @@
 import { createCanvas } from './canvas.js';
+import { rect } from './paint.js';
 
 //a costume provides animation frames for an actor: frame(animation, dir, time) where animation is 'idle', 'walk' or 'talk'.
 //definition { sheet: 'actors/hero.png', frameWidth, frameHeight, animations } uses a sprite sheet,
@@ -105,68 +106,64 @@ export class PlaceholderCostume {
 			c = this.colors,
 			side = facing === 'E',
 			walking = animation === 'walk',
-			talking = animation === 'talk' && index === 1,
-			px = (x, y, width, height, color) => {
-				context.fillStyle = color;
-				context.fillRect(x, y, width, height);
-			};
+			talking = animation === 'talk' && index === 1;
 
 		//legs
 		if (side) {
 			const stride = walking ? [0, 3, 0, -3][index] : 0;
-			px(6, 30, 4, 8, c.pants);
-			px(6 - stride, 38, 4, 8, c.pants);
-			px(6 + stride, 38, 4, 8, c.pants);
-			px(6 - stride, 46, 6, 2, c.shoes);
-			px(6 + stride, 46, 6, 2, c.shoes);
+			rect(context, 6, 30, 4, 8, c.pants);
+			rect(context, 6 - stride, 38, 4, 8, c.pants);
+			rect(context, 6 + stride, 38, 4, 8, c.pants);
+			rect(context, 6 - stride, 46, 6, 2, c.shoes);
+			rect(context, 6 + stride, 46, 6, 2, c.shoes);
 		}
 		else {
 			const lift = walking ? [0, 2, 0, -2][index] : 0,
 				leftLift = Math.max(0, lift),
 				rightLift = Math.max(0, -lift);
 
-			px(4, 30, 4, 16 - leftLift, c.pants);
-			px(4, 46 - leftLift, 4, 2, c.shoes);
-			px(8, 30, 4, 16 - rightLift, c.pants);
-			px(8, 46 - rightLift, 4, 2, c.shoes);
+			rect(context, 4, 30, 4, 16 - leftLift, c.pants);
+			rect(context, 4, 46 - leftLift, 4, 2, c.shoes);
+			rect(context, 8, 30, 4, 16 - rightLift, c.pants);
+			rect(context, 8, 46 - rightLift, 4, 2, c.shoes);
 		}
 
 		//torso and arms
 		if (side) {
 			const swing = walking ? [0, 2, 0, -2][index] : 0;
-			px(5, 13, 6, 18, c.shirt);
-			px(7 + swing, 15, 3, 11, c.shirtShade);
-			px(7 + swing, 26, 3, 3, c.skin);
+			rect(context, 5, 13, 6, 18, c.shirt);
+			rect(context, 7 + swing, 15, 3, 11, c.shirtShade);
+			rect(context, 7 + swing, 26, 3, 3, c.skin);
 		}
 		else {
 			const swing = walking ? [0, 1, 0, -1][index] : 0;
-			px(3, 13, 10, 18, c.shirt);
-			px(1, 14 + swing, 2, 12, c.shirt);
-			px(1, 26 + swing, 2, 3, c.skin);
-			px(13, 14 - swing, 2, 12, c.shirt);
-			px(13, 26 - swing, 2, 3, c.skin);
+			rect(context, 3, 13, 10, 18, c.shirt);
+			rect(context, 1, 14 + swing, 2, 12, c.shirt);
+			rect(context, 1, 26 + swing, 2, 3, c.skin);
+			rect(context, 13, 14 - swing, 2, 12, c.shirt);
+			rect(context, 13, 26 - swing, 2, 3, c.skin);
 		}
-		px(7, 12, 2, 1, c.skinShade);
+		rect(context, 7, 12, 2, 1, c.skinShade);
 
 		//head
 		if (facing === 'N')
-			px(4, 1, 8, 11, c.hair);
+			rect(context, 4, 1, 8, 11, c.hair);
 		else if (side) {
-			px(5, 2, 7, 10, c.skin);
-			px(4, 0, 7, 3, c.hair);
-			px(4, 3, 3, 6, c.hair);
-			px(9, 5, 1, 2, c.eyes);
-			px(12, 6, 1, 2, c.skin);
-			px(10, 9, 2, 1, talking ? c.mouth : c.skinShade);
+			rect(context, 5, 2, 7, 10, c.skin);
+			rect(context, 4, 0, 7, 3, c.hair);
+			rect(context, 4, 3, 3, 6, c.hair);
+			rect(context, 9, 5, 1, 2, c.eyes);
+			rect(context, 12, 6, 1, 2, c.skin);
+			rect(context, 10, 9, 2, 1, talking ? c.mouth : c.skinShade);
 		}
 		else {
-			px(4, 2, 8, 10, c.skin);
-			px(4, 0, 8, 3, c.hair);
-			px(4, 3, 1, 4, c.hair);
-			px(11, 3, 1, 4, c.hair);
-			px(6, 6, 1, 2, c.eyes);
-			px(9, 6, 1, 2, c.eyes);
-			px(7, 10, 2, 1, talking ? c.mouth : c.skinShade);
+			rect(context, 4, 2, 8, 10, c.skin);
+			rect(context, 4, 0, 8, 3, c.hair);
+			rect(context, 4, 3, 1, 4, c.hair);
+			rect(context, 11, 3, 1, 4, c.hair);
+			rect(context, 6, 6, 1, 2, c.eyes);
+			rect(context, 9, 6, 1, 2, c.eyes);
+			rect(context, 7, 10, 2, 1, talking ? c.mouth : c.skinShade);
 		}
 		return canvas;
 	}

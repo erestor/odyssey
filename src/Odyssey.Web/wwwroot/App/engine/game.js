@@ -7,9 +7,11 @@ import { createCostume } from './costumes.js';
 import { Display } from './display.js';
 import { Input } from './input.js';
 import { Room } from './room.js';
+import { availableOptions, findCombination, resolveInteraction } from './rules.js';
 import { GameState } from './state.js';
 import { Storage } from './storage.js';
 import { TextRenderer } from './text.js';
+import { validateGame } from './validate.js';
 import { Cursor } from './ui/cursor.js';
 import { DialogChoices } from './ui/dialog-choices.js';
 import { iconHeight, iconWidth, InventoryPanel } from './ui/inventory.js';
@@ -30,6 +32,7 @@ const defaultMessages = {
 export class Game {
 	constructor(container, definition) {
 		this.definition = definition;
+		this.items = definition.items ?? {};
 		this.messages = { ...defaultMessages, ...definition.messages };
 		this.storage = new Storage(definition.id);
 		this.settings = this.storage.loadSettings(defaultSettings);
@@ -67,6 +70,7 @@ export class Game {
 	}
 
 	async start() {
+		validateGame(this.definition).forEach(problem => console.warn(problem));
 		await this.applySettings();
 		this.mode = 'title';
 		await openTitleMenu(this);
@@ -212,8 +216,11 @@ export class Game {
 		return new Promise(resolve => this.openOverlay(new DialogChoices(this, texts, resolve)));
 	}
 
-	//dialog = { id, start, nodes: { name: { options: [{ id, text, once, when, say, run, goto, end }] } } }
+	//dialog is an id from the game definition's dialogs, or { id, start, nodes: { name: { options: [{ id, text, once, when, say, run, goto, end }] } } }
 	async runDialog(dialog) {
+		if (typeof dialog === 'string')
+			dialog = this.definition.dialogs[dialog];
+
 		const dialogs = this.state.dialogs;
 		if (!dialogs[dialog.id])
 			dialogs[dialog.id] = { chosen: [] };
@@ -221,7 +228,7 @@ export class Game {
 		const chosen = dialogs[dialog.id].chosen;
 		let node = dialog.nodes[dialog.start ?? 'root'];
 		while (node) {
-			const options = node.options.filter(option => !(option.once && chosen.includes(option.id)) && (!option.when || option.when(this.api)));
+			const options = availableOptions(node, chosen, this.api);
 			if (!options.length)
 				return;
 
@@ -249,6 +256,18 @@ export class Game {
 		this.pickups.push({ item: id, elapsed: 0 });
 	}
 
+	//picks up an object of the current room that has an item: the item goes to the inventory and the object is gone for good
+	async pickUp(objectId) {
+		const object = this.room.objects.find(candidate => candidate.id === objectId);
+		if (!object?.definition.item || this.state.taken[object.key])
+			return;
+
+		this.addItem(object.definition.item);
+		this.state.taken[object.key] = true;
+		if (object.definition.pickUpText)
+			await this.say(this.definition.player, object.definition.pickUpText);
+	}
+
 	removeItem(id) {
 		this.state.inventory = this.state.inventory.filter(item => item !== id);
 		if (this.heldItem === id)
@@ -256,17 +275,15 @@ export class Game {
 	}
 
 	itemName(id) {
-		return this.definition.items?.[id]?.name ?? id;
+		return this.items[id]?.name ?? id;
 	}
 
 	lookAtItem(id) {
-		this.run(this.definition.items?.[id]?.look ?? this._defaultReply('look'));
+		this.run(this.items[id]?.look ?? this._defaultReply('look'));
 	}
 
 	combineItems(held, other) {
-		const items = this.definition.items ?? {},
-			handler = items[held]?.combine?.[other] ?? items[other]?.combine?.[held];
-
+		const handler = findCombination(this.items, held, other);
 		this.heldItem = null;
 		this.run(handler ?? this._defaultReply('combine'));
 	}
@@ -400,28 +417,20 @@ export class Game {
 
 			player.face(definition.walkTo?.dir ?? target.point);
 		}
-		await this.run(this._handler(target, verb, item), definition);
+		await this.run(this._script(target, verb, item), definition);
 	}
 
-	_handler(target, verb, item) {
-		const definition = target.definition;
-		if (verb === 'look')
-			return definition.look ?? this._defaultReply('look');
+	_script(target, verb, item) {
+		const definition = target.definition,
+			result = resolveInteraction(definition, verb, item, this.items, definition.id ?? target.actor?.id);
 
-		if (verb === 'interact') {
-			if (definition.interact)
-				return definition.interact;
+		if (result.pickUp)
+			return () => this.pickUp(target.object.id);
 
-			if (definition.exit)
-				return () => this.enterRoom(definition.exit.room, definition.exit.entry);
+		if (result.exit)
+			return () => this.enterRoom(result.exit.room, result.exit.entry);
 
-			return this._defaultReply('interact');
-		}
-
-		return definition.useItem?.[item] ??
-			definition.useItem?.default ??
-			this.definition.items?.[item]?.useOn?.[definition.id ?? target.actor?.id] ??
-			this._defaultReply('useItem');
+		return result.script ?? this._defaultReply(result.reply);
 	}
 
 	_defaultReply(kind) {
@@ -592,7 +601,7 @@ export class Game {
 
 	//(re)creates everything that depends on the render profile
 	async _loadResources() {
-		const items = Object.entries(this.definition.items ?? {}),
+		const items = Object.entries(this.items),
 			icons = await Promise.all(items.map(async ([id, item]) => [id, await this.assets.picture(item.icon, iconWidth, iconHeight)]));
 
 		this.itemIcons = new Map(icons);

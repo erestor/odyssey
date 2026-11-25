@@ -11,6 +11,11 @@ export function distance(a, b) {
 	return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
+//rect is anything with x, y, width and height; the right and bottom edges are outside
+export function rectContains(rect, x, y) {
+	return x >= rect.x && x < rect.x + rect.width && y >= rect.y && y < rect.y + rect.height;
+}
+
 export function signedArea(polygon) {
 	let area = 0;
 	polygon.forEach((point, index) => {

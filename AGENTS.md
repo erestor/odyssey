@@ -48,6 +48,8 @@ Frontend-specific instructions are in `src/Odyssey.Web/AGENTS.md`. The format of
   and runs scripts. `api.js` is the only interface game content uses (`g` in scripts).
 - `room.js` holds no game state. Everything that changes lives in `GameState` (`state.js`): room, flags, inventory, actor positions, dialog progress.
   New state must go there, otherwise it is not saved.
+- `rules.js` holds the interface rules that need no screen (which handler a click runs, item combinations, available dialog options),
+  so they can be tested. `validate.js` checks the references in the game content; `game.js` logs its problems at startup.
 - `pathfinding.js` finds paths over a walk area (outer polygon with holes) using a visibility graph and A*.
 - `text.js` and `font.js` render text with a built-in 5x8 bitmap font; accented letters are composed from base glyphs and marks, so Czech and other
   Latin scripts work without extra glyphs.
@@ -61,5 +63,6 @@ Frontend-specific instructions are in `src/Odyssey.Web/AGENTS.md`. The format of
 
 ## Tests
 - Use Jasmine (`wwwroot/Tests`). Each test file is an ES module imported by `test-runner.html`; add new files there.
-- Test pure engine modules (geometry, pathfinding, text, state). Name specs as `method condition result` sentences, for example `findPath walks around a hole`.
+- Test pure engine modules (geometry, pathfinding, text, state, rules, actor, room, storage). `content.tests.js` runs `validateGame` on the real
+  game definition, so broken references in the story fail the test run. Name specs as `method condition result` sentences, for example `findPath walks around a hole`.
 - If a test is 5 lines or shorter, do not insert any blank lines.

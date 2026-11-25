@@ -55,13 +55,9 @@ export default {
 			width: 26,
 			height: 8,
 			picture: paintDriftwood,
-			visible: g => !g.flag('tookDriftwood'),
-			look: g => g.say('A piece of driftwood, bleached by the sun.'),
-			interact: async g => {
-				g.give('driftwood');
-				g.setFlag('tookDriftwood');
-				await g.say('Might come in handy.');
-			}
+			item: 'driftwood',
+			pickUpText: 'Might come in handy.',
+			look: g => g.say('A piece of driftwood, bleached by the sun.')
 		},
 		{
 			id: 'campfire',

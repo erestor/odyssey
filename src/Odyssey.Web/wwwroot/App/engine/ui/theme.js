@@ -8,7 +8,11 @@ export const colors = {
 	text: '#b0b0ff',
 	highlight: '#ffff60',
 	disabled: '#606080',
-	label: '#e0e0e0'
+	label: '#e0e0e0',
+	slot: '#181848',
+	slotHover: '#30306a',
+	bag: '#c89048',
+	bagInside: '#7a4a20'
 };
 
 export function drawPanel(context, x, y, width, height) {

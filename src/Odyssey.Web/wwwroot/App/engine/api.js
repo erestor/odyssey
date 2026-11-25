@@ -23,6 +23,7 @@ export function createApi(game) {
 		has: item => game.state.inventory.includes(item),
 		give: item => game.addItem(item),
 		take: item => game.removeItem(item),
+		pickUp: objectId => game.pickUp(objectId),
 
 		//say(text) for the player, say(actorId, text) for anyone else; text may be an array of lines
 		say: (...args) => args.length > 1 ? game.say(args[0], args[1]) : game.say(playerId(), args[0]),

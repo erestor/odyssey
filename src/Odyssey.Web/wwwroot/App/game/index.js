@@ -1,4 +1,5 @@
 import actors from './actors.js';
+import hermit from './dialogs/hermit.js';
 import items from './items.js';
 import beach from './rooms/beach.js';
 import cave from './rooms/cave.js';
@@ -15,6 +16,9 @@ export default {
 	titleScreen: paintTitle,
 	actors,
 	items,
+	dialogs: {
+		hermit
+	},
 	rooms: {
 		beach,
 		cave

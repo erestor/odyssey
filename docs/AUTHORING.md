@@ -6,6 +6,9 @@ and anything that happens in the game is an `async` script that receives the scr
 All coordinates are logical pixels: the screen is 320x200, rooms may be wider (or taller) and scroll.
 Polygons are flat coordinate lists `[x1, y1, x2, y2, ...]`.
 
+References between content (rooms, entries, items, object ids, dialog nodes) are checked by `engine/validate.js`.
+Problems are logged as warnings in the browser console when the game starts, and the `game content` spec in the test runner fails on them.
+
 ## Game definition (`index.js`)
 
 ```js
@@ -17,6 +20,7 @@ export default {
 	narratorColor: '#ffe070',   //color of g.narrate() text
 	titleScreen: painter,       //title backdrop, a painter function or an image path
 	actors, items,
+	dialogs: { hermit },        //keys are dialog ids for g.dialog('hermit')
 	rooms: { beach, cave },     //keys are room ids
 	messages: {}                //optional overrides of default replies, see engine/game.js
 };
@@ -44,7 +48,7 @@ Objects are everything in a room that can be seen or used. An object with a `nam
 
 ```js
 {
-	id: 'campfire',
+	id: 'campfire',                        //needed by objects with an item and by useOn of items
 	name: 'Campfire',                      //hover label; omit for scenery such as walk-behind layers
 	x: 186, y: 148, width: 28, height: 22, //hit rectangle and picture position
 	polygon: [...],                        //hit area instead of the rectangle
@@ -57,6 +61,21 @@ Objects are everything in a room that can be seen or used. An object with a `nam
 	interact: async g => {},               //left click
 	useItem: { torch: async g => {}, default: async g => {} },   //left click while holding an item
 	exit: { room: 'cave', entry: 'fromBeach' }                    //left click goes to another room when there is no interact
+}
+```
+
+An object that is picked up names its item. Left click (when there is no `interact`) puts the item in the inventory,
+removes the object from the room for good and says `pickUpText`. A custom `interact` can still pick it up with `await g.pickUp('driftwood')`,
+for example only after a condition is met.
+
+```js
+{
+	id: 'driftwood',
+	name: 'Driftwood',
+	x: 116, y: 182, width: 26, height: 8,
+	picture: paintDriftwood,
+	item: 'driftwood',
+	pickUpText: 'Might come in handy.'      //optional; text or an array of lines
 }
 ```
 
@@ -127,7 +146,8 @@ export default {
 };
 ```
 
-Start a dialog from a script with `await g.dialog(hermitDialog)`.
+Register dialogs under `dialogs` in `index.js` and start one from a script with `await g.dialog('hermit')`.
+Option ids must be unique within a dialog, because the progress of `once` options is saved by id.
 
 ## Script api (`g`)
 
@@ -139,9 +159,10 @@ Start a dialog from a script with `await g.dialog(hermitDialog)`.
 | `g.face('N' \| 'E' \| 'S' \| 'W' \| actor, actorId)` | turn an actor |
 | `await g.wait(ms)` | pause the script (stops while the game is paused) |
 | `g.flag(name)`, `g.setFlag(name, value = true)` | saved story state |
-| `g.has(item)`, `g.give(item)`, `g.take(item)` | inventory |
+| `g.has(item)`, `g.give(item)`, `g.take(item)` | inventory; a new item drops into the inventory bag |
+| `await g.pickUp(objectId)` | pick up an object of the current room that has an `item` |
 | `await g.goTo(roomId, entry)` | fade to another room |
-| `await g.dialog(dialog)`, `await g.choose(texts)` | dialog tree, or a single choice returning the index |
+| `await g.dialog('hermit')`, `await g.choose(texts)` | dialog tree by id, or a single choice returning the index |
 | `await g.cutscene(async g => {})` | hides the cursor and inventory button while it runs |
 | `g.actor(id)`, `g.player`, `g.room`, `g.state` | direct access when needed |
 | `g.random(list)` | random element |

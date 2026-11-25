@@ -64,6 +64,10 @@ export class Input {
 		if (preventedKeys.includes(event.key))
 			event.preventDefault();
 
+		//a held key would skip several lines of speech at once
+		if (event.repeat)
+			return;
+
 		this._events.push({ type: 'key', key: event.key });
 	}
 }

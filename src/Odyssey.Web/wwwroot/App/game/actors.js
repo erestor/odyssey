@@ -1,5 +1,3 @@
-import hermitDialog from './dialogs/hermit.js';
-
 export default {
 	hero: {
 		talkColor: '#ffffff',
@@ -20,7 +18,7 @@ export default {
 		look: g => g.say('An old hermit, warming his hands by the fire.'),
 		interact: async g => {
 			g.actor('hermit').face(g.player);
-			await g.dialog(hermitDialog);
+			await g.dialog('hermit');
 		},
 		useItem: {
 			default: g => g.say('hermit', 'Keep your junk, youngster.')

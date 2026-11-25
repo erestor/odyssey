@@ -1,4 +1,4 @@
-import { distance } from './geometry.js';
+import { distance, rectContains } from './geometry.js';
 
 const directions = ['N', 'E', 'S', 'W'];
 
@@ -109,8 +109,7 @@ export class Actor {
 	}
 
 	contains(x, y) {
-		const bounds = this.bounds();
-		return x >= bounds.x && x < bounds.x + bounds.width && y >= bounds.y && y < bounds.y + bounds.height;
+		return rectContains(this.bounds(), x, y);
 	}
 
 	draw(context) {

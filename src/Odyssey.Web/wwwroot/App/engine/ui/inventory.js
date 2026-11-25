@@ -1,4 +1,5 @@
 import { logicalHeight, logicalWidth } from '../config.js';
+import { rectContains } from '../geometry.js';
 import { rect } from '../paint.js';
 import { lineHeight } from '../text.js';
 import { colors, drawPanel } from './theme.js';
@@ -30,7 +31,7 @@ export class InventoryPanel {
 	}
 
 	static buttonContains(x, y) {
-		return x >= button.x && x < button.x + button.width && y >= button.y && y < button.y + button.height;
+		return rectContains(button, x, y);
 	}
 
 	//pickup is a newly added item ({icon, progress} from 0 to 1): it pops up above the bag, then drops in and the bag bounces
@@ -39,7 +40,7 @@ export class InventoryPanel {
 			landed = progress > 0.8,
 			x = button.x,
 			y = button.y - (landed ? 1 : 0),
-			edge = hovered || landed ? colors.highlight : '#c89048';
+			edge = hovered || landed ? colors.highlight : colors.bag;
 
 		if (pickup?.icon && !landed) {
 			const icon = pickup.icon,
@@ -56,14 +57,14 @@ export class InventoryPanel {
 			//framed like an inventory slot so the icon stands out against any background
 			const iconX = Math.max(2, Math.round(x + (button.width - icon.width) / 2));
 			rect(context, iconX - 2, Math.round(iconY) - 2, icon.width + 4, icon.height + 4, '#000');
-			rect(context, iconX - 1, Math.round(iconY) - 1, icon.width + 2, icon.height + 2, '#181848');
+			rect(context, iconX - 1, Math.round(iconY) - 1, icon.width + 2, icon.height + 2, colors.slot);
 			context.drawImage(icon.source, iconX, Math.round(iconY), icon.width, icon.height);
 			context.restore();
 		}
 
 		rect(context, x + 2, y + 3, 14, 10, '#000');
 		rect(context, x + 1, y + 2, 14, 10, edge);
-		rect(context, x + 2, y + 3, 12, 8, '#7a4a20');
+		rect(context, x + 2, y + 3, 12, 8, colors.bagInside);
 		rect(context, x + 5, y, 6, 3, edge);
 		rect(context, x + 6, y + 1, 4, 1, '#000');
 		rect(context, x + 2, y + 5, 12, 1, edge);
@@ -90,7 +91,7 @@ export class InventoryPanel {
 
 		const item = this._itemAt(event.x, event.y);
 		if (!item) {
-			if (!this._contains(event.x, event.y))
+			if (!rectContains(this, event.x, event.y))
 				this.close();
 
 			return;
@@ -114,12 +115,12 @@ export class InventoryPanel {
 		drawPanel(context, this.x, this.y, this.width, this.height);
 		game.state.inventory.slice(0, columns * maxRows).forEach((item, index) => {
 			const slot = this._slot(index), icon = game.itemIcons.get(item);
-			rect(context, slot.x, slot.y, slotWidth - 2, slotHeight - 2, item === this.hovered ? '#30306a' : '#181848');
+			rect(context, slot.x, slot.y, slot.width, slot.height, item === this.hovered ? colors.slotHover : colors.slot);
 			if (item === game.heldItem)
-				rect(context, slot.x, slot.y + slotHeight - 3, slotWidth - 2, 1, colors.highlight);
+				rect(context, slot.x, slot.y + slot.height - 1, slot.width, 1, colors.highlight);
 
 			if (icon)
-				context.drawImage(icon.source, slot.x + (slotWidth - 2 - icon.width) / 2, slot.y + (slotHeight - 2 - icon.height) / 2, icon.width, icon.height);
+				context.drawImage(icon.source, slot.x + (slot.width - icon.width) / 2, slot.y + (slot.height - icon.height) / 2, icon.width, icon.height);
 		});
 
 		const held = game.heldItem,
@@ -134,19 +135,16 @@ export class InventoryPanel {
 	_slot(index) {
 		return {
 			x: this.x + padding + (index % columns) * slotWidth + 1,
-			y: this.y + padding + Math.floor(index / columns) * slotHeight + 1
+			y: this.y + padding + Math.floor(index / columns) * slotHeight + 1,
+			width: slotWidth - 2,
+			height: slotHeight - 2
 		};
-	}
-
-	_contains(x, y) {
-		return x >= this.x && x < this.x + this.width && y >= this.y && y < this.y + this.height;
 	}
 
 	_itemAt(x, y) {
 		const inventory = this.game.state.inventory;
 		for (let index = 0; index < Math.min(inventory.length, columns * maxRows); index++) {
-			const slot = this._slot(index);
-			if (x >= slot.x && x < slot.x + slotWidth - 2 && y >= slot.y && y < slot.y + slotHeight - 2)
+			if (rectContains(this._slot(index), x, y))
 				return inventory[index];
 		}
 		return null;

@@ -20,53 +20,31 @@ export async function openTitleMenu(game) {
 }
 
 export function openPauseMenu(game) {
-	const menu = new Menu(game, {
-		title: 'Paused',
-		onCancel: () => game.closeOverlay(menu),
-		items: [
-			{ label: 'Resume', action: () => game.closeOverlay(menu) },
-			{ label: 'Save game', action: async () => openSaveMenu(game, await game.storage.list()) },
-			{ label: 'Load game', action: async () => openLoadMenu(game, await game.storage.list()) },
-			{ label: 'Settings', action: () => openSettingsMenu(game) },
-			{ label: 'Quit to title', action: () => game.quitToTitle() }
-		]
-	});
-	game.openOverlay(menu);
+	openSubmenu(game, 'Paused', [
+		{ label: 'Save game', action: async () => openSaveMenu(game, await game.storage.list()) },
+		{ label: 'Load game', action: async () => openLoadMenu(game, await game.storage.list()) },
+		{ label: 'Settings', action: () => openSettingsMenu(game) },
+		{ label: 'Quit to title', action: () => game.quitToTitle() }
+	], 'Resume', true);
 }
 
 function openSaveMenu(game, saves) {
-	const menu = new Menu(game, {
-		title: 'Save game',
-		onCancel: () => game.closeOverlay(menu),
-		items: [
-			...slotNumbers(1).map(slot => ({
-				label: slotLabel(slot, saves),
-				action: async () => {
-					await game.saveGame(slot);
-					game.closeAllOverlays();
-					game.say(null, game.messages.saved);
-				}
-			})),
-			{ label: 'Back', action: () => game.closeOverlay(menu) }
-		]
-	});
-	game.openOverlay(menu);
+	openSubmenu(game, 'Save game', slotNumbers(1).map(slot => ({
+		label: slotLabel(slot, saves),
+		action: async () => {
+			await game.saveGame(slot);
+			game.closeAllOverlays();
+			game.say(null, game.messages.saved);
+		}
+	})));
 }
 
 function openLoadMenu(game, saves) {
-	const menu = new Menu(game, {
-		title: 'Load game',
-		onCancel: () => game.closeOverlay(menu),
-		items: [
-			...slotNumbers(0).map(slot => ({
-				label: slotLabel(slot, saves),
-				action: () => game.loadGame(slot),
-				disabled: () => !saves.some(save => save.slot === slot)
-			})),
-			{ label: 'Back', action: () => game.closeOverlay(menu) }
-		]
-	});
-	game.openOverlay(menu);
+	openSubmenu(game, 'Load game', slotNumbers(0).map(slot => ({
+		label: slotLabel(slot, saves),
+		action: () => game.loadGame(slot),
+		disabled: () => !saves.some(save => save.slot === slot)
+	})));
 }
 
 function openSettingsMenu(game) {
@@ -75,31 +53,33 @@ function openSettingsMenu(game) {
 			settings[name] = value;
 			await game.applySettings();
 		},
-		profiles = Object.values(renderProfiles),
-		menu = new Menu(game, {
-			title: 'Settings',
-			onCancel: () => game.closeOverlay(menu),
-			items: [
-				{
-					label: () => `Text speed: ${textSpeeds.find(speed => speed.value === settings.textSpeed)?.name ?? 'Normal'}`,
-					action: () => change('textSpeed', next(textSpeeds, speed => speed.value === settings.textSpeed).value)
-				},
-				{
-					label: () => `Scaling: ${settings.scaleMode === 'integer' ? 'Sharp pixels' : 'Fill screen'}`,
-					action: () => change('scaleMode', settings.scaleMode === 'integer' ? 'fit' : 'integer')
-				},
-				{
-					label: () => `4:3 aspect: ${settings.aspectCorrection ? 'On' : 'Off'}`,
-					action: () => change('aspectCorrection', !settings.aspectCorrection)
-				},
-				{
-					label: () => `Graphics: ${renderProfiles[settings.profile]?.name ?? settings.profile}`,
-					action: () => change('profile', next(profiles, profile => profile.id === settings.profile).id)
-				},
-				{ label: 'Fullscreen', action: () => game.display.toggleFullscreen() },
-				{ label: 'Back', action: () => game.closeOverlay(menu) }
-			]
-		});
+		profiles = Object.values(renderProfiles);
+
+	openSubmenu(game, 'Settings', [
+		{
+			label: () => `Text speed: ${textSpeeds.find(speed => speed.value === settings.textSpeed)?.name ?? 'Normal'}`,
+			action: () => change('textSpeed', next(textSpeeds, speed => speed.value === settings.textSpeed).value)
+		},
+		{
+			label: () => `Scaling: ${settings.scaleMode === 'integer' ? 'Sharp pixels' : 'Fill screen'}`,
+			action: () => change('scaleMode', settings.scaleMode === 'integer' ? 'fit' : 'integer')
+		},
+		{
+			label: () => `4:3 aspect: ${settings.aspectCorrection ? 'On' : 'Off'}`,
+			action: () => change('aspectCorrection', !settings.aspectCorrection)
+		},
+		{
+			label: () => `Graphics: ${renderProfiles[settings.profile]?.name ?? settings.profile}`,
+			action: () => change('profile', next(profiles, profile => profile.id === settings.profile).id)
+		},
+		{ label: 'Fullscreen', action: () => game.display.toggleFullscreen() }
+	]);
+}
+
+//a menu that closes on Escape or right click and has a closing item (Back) at the end or, with closeFirst, at the start
+function openSubmenu(game, title, items, closeLabel = 'Back', closeFirst = false) {
+	const close = { label: closeLabel, action: () => game.closeOverlay(menu) },
+		menu = new Menu(game, { title, onCancel: close.action, items: closeFirst ? [close, ...items] : [...items, close] });
 
 	game.openOverlay(menu);
 }
