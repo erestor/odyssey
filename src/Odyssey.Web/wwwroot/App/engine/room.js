@@ -9,6 +9,7 @@ export class Room {
 		this.id = id;
 		this.definition = definition;
 		this.name = definition.name ?? id;
+		this.isMap = !!definition.map; //a map has no player: its objects are destinations that act at once
 		this.width = definition.width ?? logicalWidth;
 		this.height = definition.height ?? logicalHeight;
 		this.walkArea = WalkArea.fromDefinition(definition.walkArea, this.width, this.height);

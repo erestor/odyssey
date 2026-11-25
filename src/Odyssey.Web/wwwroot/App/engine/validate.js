@@ -37,6 +37,9 @@ export function validateGame(definition) {
 					report(where, `${place} (${point.x}, ${point.y}) is outside the walk area`);
 			};
 
+		if (room.map && (room.width ?? logicalWidth) > logicalWidth)
+			report(where, 'a map cannot scroll, it must not be wider than the screen');
+
 		for (const [name, entry] of Object.entries(room.entries ?? {}))
 			checkWalkable(`entry '${name}'`, entry);
 

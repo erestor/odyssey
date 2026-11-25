@@ -3,6 +3,7 @@ import hermit from './dialogs/hermit.js';
 import items from './items.js';
 import beach from './rooms/beach.js';
 import cave from './rooms/cave.js';
+import map from './rooms/map.js';
 import { paintTitle } from './title.js';
 
 //the game definition: everything the engine needs to know about the story.
@@ -21,6 +22,7 @@ export default {
 	},
 	rooms: {
 		beach,
-		cave
+		cave,
+		map
 	}
 };

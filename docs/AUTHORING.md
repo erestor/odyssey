@@ -21,7 +21,7 @@ export default {
 	titleScreen: painter,       //title backdrop, a painter function or an image path
 	actors, items,
 	dialogs: { hermit },        //keys are dialog ids for g.dialog('hermit')
-	rooms: { beach, cave },     //keys are room ids
+	rooms: { beach, cave, map },   //keys are room ids
 	messages: {}                //optional overrides of default replies, see engine/game.js
 };
 ```
@@ -80,6 +80,29 @@ for example only after a condition is met.
 ```
 
 Without a handler the player answers with a random default reply (`look`, `interact`, `useItem` in `engine/game.js`).
+
+### Maps
+
+A map is a room with `map: true`, from which the player travels between locations. The player is not shown on a map
+and does not walk there: a left click on a destination runs its handler at once, and a click elsewhere does nothing.
+Destinations are ordinary objects, usually with an `exit` to the room where the player arrives in that location.
+A map is one screen (320x200) and needs no walk area, scaling or entries.
+
+```js
+export default {
+	name: 'Sea chart',
+	map: true,
+	background: paintChart,
+	objects: [
+		{ id: 'island', name: 'Hermit\'s island', polygon: [...], exit: { room: 'beach', entry: 'start' } },
+		{ id: 'lighthouse', name: 'Lighthouse rock', polygon: [...], visible: g => g.flag('heardOfLighthouse'), exit: { ... } }
+	]
+};
+```
+
+The first screen of a location leads back with an object such as `exit: { room: 'map' }` (no entry is needed),
+and any script can return to the map with `await g.goTo('map')`. Use `visible` to reveal destinations as the story goes on.
+Several maps are just several map rooms.
 
 ## Actors (`actors.js`)
 
@@ -161,7 +184,7 @@ Option ids must be unique within a dialog, because the progress of `once` option
 | `g.flag(name)`, `g.setFlag(name, value = true)` | saved story state |
 | `g.has(item)`, `g.give(item)`, `g.take(item)` | inventory; a new item drops into the inventory bag |
 | `await g.pickUp(objectId)` | pick up an object of the current room that has an `item` |
-| `await g.goTo(roomId, entry)` | fade to another room |
+| `await g.goTo(roomId, entry)` | fade to another room, or to a map with `g.goTo('map')` |
 | `await g.dialog('hermit')`, `await g.choose(texts)` | dialog tree by id, or a single choice returning the index |
 | `await g.cutscene(async g => {})` | hides the cursor and inventory button while it runs |
 | `g.actor(id)`, `g.player`, `g.room`, `g.state` | direct access when needed |

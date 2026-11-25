@@ -141,7 +141,7 @@ export class Game {
 				player = this.player,
 				firstVisit = !this.state.visited[id];
 
-			player.restore({ room: id, x: entry.x, y: entry.y, dir: entry.dir ?? 'S' });
+			player.restore({ room: room.isMap ? null : id, x: entry.x, y: entry.y, dir: entry.dir ?? 'S' });
 			this.state.visited[id] = true;
 			this._showRoom(room);
 			await this._fadeTo(0);
@@ -395,11 +395,11 @@ export class Game {
 		}
 		else if (target)
 			this._interact(target, this.heldItem ? 'useItem' : 'interact', point);
-		else
+		else if (!this.room.isMap)
 			this.walkActor(this.player, point);
 	}
 
-	//walks the player to the target (except when just looking) and runs the matching handler of its definition
+	//walks the player to the target (except when just looking or on a map) and runs the matching handler of its definition
 	async _interact(target, verb, point) {
 		const player = this.player,
 			definition = target.definition,
@@ -410,7 +410,7 @@ export class Game {
 
 		if (verb === 'look')
 			player.face(target.point);
-		else {
+		else if (!this.room.isMap) {
 			const arrived = await this.walkActor(player, this._walkDestination(target, point));
 			if (!arrived)
 				return;

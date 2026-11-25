@@ -48,6 +48,18 @@ export default {
 			interact: g => g.say('It\'s nailed down tight.')
 		},
 		{
+			id: 'boat',
+			name: 'Rowing boat',
+			x: 2,
+			y: 144,
+			width: 38,
+			height: 14,
+			picture: paintBoat,
+			walkTo: { x: 30, y: 170, dir: 'W' },
+			look: g => g.say('My trusty rowing boat. It can take me anywhere on the chart.'),
+			exit: { room: 'map' }
+		},
+		{
 			id: 'driftwood',
 			name: 'Driftwood',
 			x: 116,
@@ -162,6 +174,14 @@ function paintBackground(context, width, height) {
 function paintDriftwood(context) {
 	polygon(context, [0, 5, 22, 1, 26, 3, 24, 6, 2, 8], '#c8b090', '#8a7050', 0.4);
 	rect(context, 6, 4, 4, 1, '#6a5030');
+}
+
+function paintBoat(context) {
+	polygon(context, [0, 4, 38, 4, 32, 13, 6, 13], '#7a4a28', '#5a3418', 0.3);
+	rect(context, 0, 4, 38, 2, '#a06a3a');
+	rect(context, 10, 6, 2, 6, '#4a2810');
+	rect(context, 26, 6, 2, 6, '#4a2810');
+	rect(context, 14, 0, 2, 5, '#c89060');
 }
 
 function paintPalm(context) {

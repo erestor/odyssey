@@ -61,6 +61,11 @@ describe('validateGame', () => {
 		]);
 	});
 
+	it('validateGame reports a map wider than the screen', () => {
+		const problems = validateGame(game({ rooms: { ...roomWith([]), chart: { map: true, width: 480 } } }));
+		expect(problems).toEqual(['room \'chart\': a map cannot scroll, it must not be wider than the screen']);
+	});
+
 	it('validateGame reports useOn targets that do not exist', () => {
 		const problems = validateGame(game({ items: { key: { useOn: { hero: () => {}, chest: () => {} } } } }));
 		expect(problems).toEqual(['item \'key\' useOn: unknown object or actor \'chest\'']);

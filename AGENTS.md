@@ -48,6 +48,7 @@ Frontend-specific instructions are in `src/Odyssey.Web/AGENTS.md`. The format of
   and runs scripts. `api.js` is the only interface game content uses (`g` in scripts).
 - `room.js` holds no game state. Everything that changes lives in `GameState` (`state.js`): room, flags, inventory, actor positions, dialog progress.
   New state must go there, otherwise it is not saved.
+  A room with `map: true` is a map: the player is not placed in it and clicks on its objects act without walking.
 - `rules.js` holds the interface rules that need no screen (which handler a click runs, item combinations, available dialog options),
   so they can be tested. `validate.js` checks the references in the game content; `game.js` logs its problems at startup.
 - `pathfinding.js` finds paths over a walk area (outer polygon with holes) using a visibility graph and A*.

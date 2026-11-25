@@ -27,6 +27,11 @@ describe('Room', () => {
 		expect(new Room('empty', {}).scaleAt(50)).toBe(1);
 	});
 
+	it('constructor marks a map room', () => {
+		expect(new Room('chart', { map: true }).isMap).toBeTrue();
+		expect(room.isMap).toBeFalse();
+	});
+
 	it('entry falls back to the first entry and then to the bottom center', () => {
 		expect(room.entry('window')).toEqual({ x: 300, y: 150 });
 		expect(room.entry('chimney')).toEqual({ x: 10, y: 150 });
