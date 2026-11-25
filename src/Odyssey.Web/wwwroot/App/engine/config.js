@@ -20,7 +20,8 @@ export const timing = {
 	maxFrame: 250,
 	fade: 300,
 	cameraSpeed: 160,
-	cameraMargin: 100
+	cameraMargin: 100,
+	pickup: 1000
 };
 
 export const textTiming = {

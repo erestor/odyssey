@@ -12,22 +12,23 @@ export class Cursor {
 	draw(context) {
 		const game = this.game,
 			pointer = game.input.pointer,
-			inWorld = game.mode === 'play' && !game.overlays.length;
+			inWorld = game.mode === 'play' && !game.overlays.length,
+			overlay = game.overlays.at(-1);
 
 		if (!pointer.inside || (inWorld && game.cutscenes))
 			return;
 
 		const { x, y } = pointer,
-			icon = inWorld && game.heldItem ? game.itemIcons.get(game.heldItem) : null;
+			active = inWorld ? !!game.hover : !!overlay?.hovering,
+			icon = (inWorld || overlay?.showsHeldItem) && game.heldItem ? game.itemIcons.get(game.heldItem) : null;
 
 		if (icon) {
 			context.drawImage(icon.source, Math.round(x - icon.width / 2), Math.round(y - icon.height / 2), icon.width, icon.height);
-			if (!game.hover)
+			if (!active)
 				return;
 		}
 
-		const active = inWorld ? !!game.hover : !!game.overlays.at(-1)?.hovering,
-			color = active ? activeColors[Math.floor(game.time / 120) % activeColors.length] : inWorld && game.busy ? '#808080' : '#ffffff';
+		const color = active ? activeColors[Math.floor(game.time / 120) % activeColors.length] : inWorld && game.busy ? '#808080' : '#ffffff';
 
 		for (const [dx, dy] of arms) {
 			for (let distance = 2; distance <= 5; distance++)

@@ -52,7 +52,8 @@ Frontend-specific instructions are in `src/Odyssey.Web/AGENTS.md`. The format of
 - `text.js` and `font.js` render text with a built-in 5x8 bitmap font; accented letters are composed from base glyphs and marks, so Czech and other
   Latin scripts work without extra glyphs.
 - `ui/` contains overlays (menus, inventory, dialog choices) and the cursor. An overlay has `update`, `handle(event)`, `draw(context)`,
-  and the flags `pauses` (stops the world) and `covers` (hides the hover label and inventory button).
+  and the flags `pauses` (stops the world) and `covers` (hides the hover label and inventory button),
+  and optionally `showsHeldItem` (keeps the held item as the cursor while the overlay is open).
 
 ### Game content (`wwwroot/App/game`)
 - Data and scripts only, no engine code. `index.js` is the game definition.

@@ -50,6 +50,7 @@ export class Game {
 		this.busy = 0;
 		this.cutscenes = 0;
 		this.heldItem = null;
+		this.pickups = [];
 		this.hover = null;
 		this.cameraX = 0;
 		this.time = 0;
@@ -241,8 +242,11 @@ export class Game {
 	}
 
 	addItem(id) {
-		if (!this.state.inventory.includes(id))
-			this.state.inventory.push(id);
+		if (this.state.inventory.includes(id))
+			return;
+
+		this.state.inventory.push(id);
+		this.pickups.push({ item: id, elapsed: 0 });
 	}
 
 	removeItem(id) {
@@ -317,6 +321,7 @@ export class Game {
 			actor.update(dt);
 		}
 		this._updateCamera(dt);
+		this._updatePickups(dt);
 
 		const pointer = this.input.pointer;
 		this.hover = !this.busy && !this.overlays.length && pointer.inside ? this._targetAt(pointer.x, pointer.y) : null;
@@ -520,6 +525,17 @@ export class Game {
 		});
 	}
 
+	//new items drop into the inventory bag one after another, but only while the bag is visible (not in a cutscene)
+	_updatePickups(dt) {
+		const pickup = this.pickups[0];
+		if (!pickup || this.cutscenes)
+			return;
+
+		pickup.elapsed += dt;
+		if (pickup.elapsed >= timing.pickup)
+			this.pickups.shift();
+	}
+
 	_updateFade(dt) {
 		const fade = this.fade;
 		if (!fade.resolve)
@@ -540,6 +556,7 @@ export class Game {
 		this.texts = [];
 		this._timers = [];
 		this.heldItem = null;
+		this.pickups = [];
 		this.hover = null;
 		this.busy = 0;
 		this.cutscenes = 0;
@@ -669,8 +686,11 @@ export class Game {
 		if (this.cutscenes)
 			return;
 
-		const pointer = this.input.pointer;
-		InventoryPanel.drawButton(context, !this.busy && pointer.inside && InventoryPanel.buttonContains(pointer.x, pointer.y));
+		const pointer = this.input.pointer,
+			pickup = this.pickups[0];
+
+		InventoryPanel.drawButton(context, !this.busy && pointer.inside && InventoryPanel.buttonContains(pointer.x, pointer.y),
+			pickup && { icon: this.itemIcons.get(pickup.item), progress: pickup.elapsed / timing.pickup });
 		if (this.busy)
 			return;
 

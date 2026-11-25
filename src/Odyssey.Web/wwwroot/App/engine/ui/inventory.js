@@ -21,6 +21,7 @@ export class InventoryPanel {
 		this.game = game;
 		this.pauses = true;
 		this.covers = true;
+		this.showsHeldItem = true;
 		this.width = columns * slotWidth + padding * 2;
 		this.height = rows * slotHeight + padding * 2 + lineHeight;
 		this.x = Math.floor((logicalWidth - this.width) / 2);
@@ -32,8 +33,34 @@ export class InventoryPanel {
 		return x >= button.x && x < button.x + button.width && y >= button.y && y < button.y + button.height;
 	}
 
-	static drawButton(context, hovered) {
-		const { x, y } = button, edge = hovered ? colors.highlight : '#c89048';
+	//pickup is a newly added item ({icon, progress} from 0 to 1): it pops up above the bag, then drops in and the bag bounces
+	static drawButton(context, hovered, pickup) {
+		const progress = pickup?.progress ?? 0,
+			landed = progress > 0.8,
+			x = button.x,
+			y = button.y - (landed ? 1 : 0),
+			edge = hovered || landed ? colors.highlight : '#c89048';
+
+		if (pickup?.icon && !landed) {
+			const icon = pickup.icon,
+				mouth = button.y + 3,
+				top = button.y - icon.height - 8,
+				iconY = progress < 0.3 ? mouth + (top - mouth) * (1 - (1 - progress / 0.3) ** 2) :
+					progress < 0.6 ? top : top + (mouth - top) * ((progress - 0.6) / 0.2) ** 2;
+
+			//the icon disappears into the mouth of the bag
+			context.save();
+			context.beginPath();
+			context.rect(0, 0, logicalWidth, mouth);
+			context.clip();
+			//framed like an inventory slot so the icon stands out against any background
+			const iconX = Math.max(2, Math.round(x + (button.width - icon.width) / 2));
+			rect(context, iconX - 2, Math.round(iconY) - 2, icon.width + 4, icon.height + 4, '#000');
+			rect(context, iconX - 1, Math.round(iconY) - 1, icon.width + 2, icon.height + 2, '#181848');
+			context.drawImage(icon.source, iconX, Math.round(iconY), icon.width, icon.height);
+			context.restore();
+		}
+
 		rect(context, x + 2, y + 3, 14, 10, '#000');
 		rect(context, x + 1, y + 2, 14, 10, edge);
 		rect(context, x + 2, y + 3, 12, 8, '#7a4a20');
@@ -95,7 +122,11 @@ export class InventoryPanel {
 				context.drawImage(icon.source, slot.x + (slotWidth - 2 - icon.width) / 2, slot.y + (slotHeight - 2 - icon.height) / 2, icon.width, icon.height);
 		});
 
-		const label = this.hovered ? game.itemName(this.hovered) : game.state.inventory.length ? '' : game.messages.emptyInventory;
+		const held = game.heldItem,
+			hovered = this.hovered,
+			label = held ? game.messages.useLabel(game.itemName(held), hovered && hovered !== held ? game.itemName(hovered) : null) :
+				hovered ? game.itemName(hovered) : game.state.inventory.length ? '' : game.messages.emptyInventory;
+
 		if (label)
 			game.text.draw(context, label, this.x + this.width / 2, this.y + this.height - lineHeight - 3, { color: colors.label });
 	}
