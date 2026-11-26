@@ -123,3 +123,60 @@ boudách spí teroristi, ve třetí je nehlídaný, svázaný Rundy. Z vrhače v
 nůž, přeříznout pouta a odejít. Samo se vrátí do Brna.
 pro barvení ohně: Li2SO4 karmínově červená, CuSO4 zelená, NaCl žlutá, KCl
 růžovo fialová.
+
+Úkoly ke členům Excaliburu:
+Francouz: jeho adresa je známá jako první, normálně se baví.
+John Gold a Med Johnson: pohybuje se někde v 1. okrujhu ulic v Brně, říct mu,
+že John Gold má nové bomba hry. Až se zeptá od jakých firem, říct LucasArts a
+apak Sierra. Jde s ním ke Goldovi, který nic neví. Dojde k hádce mezi všemi
+třemi po níž řeknou něco o Delfínovi. Po mlaých výzvědách už se dá jít k
+Delfínovi.
+
+Delfín: Jít na Invex do Bčka do stánku Escomu, vyplnit anketní lístek a hodit
+do akvária. Až bude slosování stoupnout si do davu. Po chvíli kecání několik
+lidí odejde. Po jednou zůstane peněženka. Uvnitř je občanský průkaz a nic víc.
+Všechny ceny kromě první vyhrají lidé kolem (tričko, diskety, zvuková karta,
+hra Odysea). Na první cenu se nikdo nepřihlásí. Přihlásit se a ukázat občanku,
+výhra je počítač. Jít do Ačka k Silicon Graphics, koupit diskety, sednout k
+superpočítači a prohlížet si obrázky. Přijde baba a zeptá se, zda má zájem o
+koupi. Říct ano, baba zkoprní, nahrát obrázek slečny na disketu. Baba se
+probere, rychle pryč. Při útěku se disketa omylem dotkne magnetu. Dát ji
+Delfínovi. Data se porušila tak, že vznikl Dungeon v SVGA, který měl v
+titulcích všude jméno Delfín jako autora. Delfín je štěstím bez sebe, dát mu
+ještě darovací listinu na počítač z invexu a prozradí adresy nadřízených.
+
+Jan Eisler: zdržuje se v učebně informatiky v nekonečném rozhovoru s prof.
+Urbínkem,  Urbánka odpoutat: zapnout počítač, spustit Pascal, napsat program a
+spustit. Urbánek si přestane Eisnera všímat. Eisner se rozčílí a chce 
+věci: Dokázat, že odebírá Excalibur - jít za Ludíkem, přemluvit ho, dá
+účtenku, modré z nebe chce taky ale odpustí. Prozradí, že je ovládá nějaká
+temná síla a v tu chvíli padne mrtev.
+
+Martin Ludík: Jít do Ulic 2, přepadnou ho cikání.Chvíli se pokoušet mluvit,
+pak přijdou černí šerifové a přidají se k nim. Probudí se na stejném místě s
+prázdým inventářem. Vedle leží pistolka na vodu, vzít. Pohorzit s ní Ludíkovi,
+řekne vše.U Haquelova domu zazvonit, mluví o zajatém kamarádu Rundym, dál se
+nebaví. Po osvobození Haquel řekne že hlavní kontakt na piráta ma Shaow of the
+Beast.
+
+Shadow of the beast: Na dotazy nereflektuje, podívat se na kalendář, je tam
+schůzka v 16 hodin. Jít do obchodu, koupiut masku na karneval, Jít v 16 hodin
+k Shadowovi, říct, že je Delfín. Uvěří a nechá vstoupit do bytu a odejdena
+schůzku. Počítač chce heslo, to je vytlačeno na zápisníku - přečmárat tužkou.
+Po vstupu do DOSu napsat format c: a stiknout Enter. V té chvíli přijde
+Shadow, který si zapomněl deštník, říct, že jestli neřekne kde je pirát,
+zmáčkne zase Enter. Neřekne. Dát Enter. To ještě neformátuje. Zpakovat
+vyhrůžku, ustoupí a řekne, kde je pirát, ale lže. Znova dát Enter a smazat mu disk.
+Shadow žalem opelichá a na každém peříčku je pirátova pravá adresa.
+
+Pirát: Jít do zastavárny, na dluh koupit slzák. Jít do ulic kde jsou cikání,
+použít slzák. Prohledat a všechny předměty se vrátí do inventroy. Zaplatrit dluh a koupit
+odznak policie. Na tento připsat tužkou softwarová a jít k pirátovi. Není
+doma. Jít do parku a sebrat list, na ten napsat vzkaz pirátovi. Dát ho
+pirátovi na dveře. Zrovna přichází. Promluvit s ním (tvrdě a ukázat odznak),
+řekne že nejsou důkazy a zamkne se. Zavolat z budky pirátovi (jméno je na jeho 
+dveřich na zvonku) říct aby přišel na schůzku před domem ve 14 hodin. Pak
+zavolat skutečné policii, aby ve 14 hodin přišla. Důkazy: Jít na stánek, kde
+jsou noviny s inzerátem od piráta, že prodá hry. Koupit. Až přijde Softwarová
+policie, jednomu ukázat inzerát, dát mu peníze a říct ať si jde něco koupit
+(hru). Vrátí se se zatčeným pirátem. End of part 1.
